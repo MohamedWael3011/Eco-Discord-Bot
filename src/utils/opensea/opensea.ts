@@ -12,6 +12,7 @@ async function getListings(tokenId: number, bot) {
       chain: "matic",
       protocol: "seaport",
     });
+    console.log(lisitngs.data);
 
     return lisitngs.data;
   } catch (err) {
@@ -19,10 +20,14 @@ async function getListings(tokenId: number, bot) {
   }
 }
 
+function getTimestampInSeconds() {
+  return Math.floor(Date.now() / 1000);
+}
+
 export default async function isListed(tokenId: number, bot) {
   const listings = await getListings(tokenId, bot);
   let flag = false;
-  const currentTimestamp = Date.now();
+  const currentTimestamp = getTimestampInSeconds();
   listings.orders.forEach((order) => {
     if (order.expiration_time >= currentTimestamp) {
       flag = true;
