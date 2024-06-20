@@ -7,11 +7,6 @@ import {
   TextChannel,
 } from "discord.js";
 import { ExtendedClient } from "../interfaces/ExtendedClient";
-import * as ShopUtils from "../models/Shop";
-import { getBalance, removeBalance, userModel } from "../models/User";
-import { errorHandler } from "../logger/errorHandler";
-import { ADMIN_CHAT } from "../consts/channels";
-import buyItem from "../utils/buyItem";
 import { addBankData } from "../models/Bank";
 import { isAdmin } from "../utils/isAdmin";
 

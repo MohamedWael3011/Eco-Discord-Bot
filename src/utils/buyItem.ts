@@ -1,8 +1,8 @@
 import { TextChannel } from "discord.js";
-import { ADMIN_CHAT } from "../consts/channels";
 import { getBalance, removeBalance, userModel } from "../models/User";
 import * as ShopUtils from "./../models/Shop";
 import { errorHandler } from "../logger/errorHandler";
+import { Config } from "../models/Rewards";
 export default async function buyItem(
   interaction,
   bot,
@@ -63,6 +63,9 @@ export default async function buyItem(
           `${item[0].itemName} has been purchased successfully and you have been assigned the ${role.name} role. Please open a ticket to claim the item!`
         );
 
+        const config = await Config.findOne({ name: "default" });
+
+        const ADMIN_CHAT = config.adminChannel;
         const adminChat = (await bot.channels.fetch(ADMIN_CHAT)) as TextChannel;
         await adminChat.send(
           `<@${interaction.user.id}> has purchased ${item[0].itemName}`
