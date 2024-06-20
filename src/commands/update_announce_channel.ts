@@ -25,6 +25,7 @@ export async function execute(
     await interaction.deferReply();
     const channel = interaction.options.getChannel("announce_channel");
     await updadeAnnouncementChannel(channel.id);
+    bot.cache.announce_channel = channel.id;
     return await interaction.followUp({
       content: `Announcement Channel Has been updated :D`,
     });
