@@ -27,9 +27,11 @@ export async function execute(
   interaction: ChatInputCommandInteraction
 ) {
   if (await isAdmin(interaction)) {
+    await interaction.deferReply();
+
     const amount = interaction.options.getNumber("react_rate");
     await updateReactRewardRates(Number(amount));
-    return await interaction.reply({
+    return await interaction.followUp({
       content: `React Reward Rate Has been updated :D`,
     });
   }

@@ -2,7 +2,7 @@ import { ApplicationCommandData, Client, Collection, WebhookClient } from "disco
 import { ICommand } from "./ICommand";
 
 export interface ExtendedClient extends Client {
-  cache: { [key: string]: { allow: string[]; deny: string[] } };
+  cache: { [key: string]: string | number };
   commands: ICommand ;
   config: {
     token: string;

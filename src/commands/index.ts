@@ -13,3 +13,7 @@ export * as add_balance from "./add_balance";
 export * as remove_balance from "./remove_balance";
 export * as update_message_rate from "./update_message_rate";
 export * as update_react_rate from "./update_react_rate";
+export * as update_admin_channel from "./update_admin_channel";
+export * as update_announce_channel from "./update_announce_channel";
+
+

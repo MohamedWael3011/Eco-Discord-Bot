@@ -31,7 +31,6 @@ import {
 import { bankEmbedBuilder } from "./utils/bankEmbedBalance";
 import { isNumber } from "./utils/isNumber";
 import { Config, initializeConfig, Reward } from "./models/Rewards";
-import { AANNOUNCEMENT_CHAT } from "./consts/channels";
 
 config();
 const COOLDOWN_TIME = 60000;
@@ -67,6 +66,11 @@ const messageCooldowns = new Map();
     if (user.bot) return;
 
     // Replace with your channel ID
+    if (!client.cache.announcement_channel) {
+      const config = await Config.findOne({ name: "default" });
+      client.cache.announcement_channel = config.announcementChannel;
+    }
+    const AANNOUNCEMENT_CHAT = client.cache.announcement_channel;
 
     // Check if the reaction is from thea specific channel
     if (reaction.message.channel.id !== AANNOUNCEMENT_CHAT) return;
