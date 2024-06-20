@@ -13,7 +13,6 @@ export async function getUserOwnedTokenIds(userAddress: string) {
     const contract = await sdk.getContract(process.env.CONTRACT);
     const ownedNFTs = await contract.erc721.getOwnedTokenIds(userAddress);
     const ownedNFTString = ownedNFTs.map((i) => i.toString());
-
     return ownedNFTString;
   } catch (err) {
     console.error(err);
@@ -26,3 +25,5 @@ export async function isTokenOwner(userAddress: string, tokenId) {
   const ownedNFTString = ownedNFTs.map((i) => i.toString());
   return ownedNFTString.includes(tokenId);
 }
+
+

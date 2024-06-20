@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "opensea",
+      "source": "@opensea/v2.0#jp9eg2plxdi70wb",
+      "integrity": "sha512-nMzUmdTQxywcCvhynVGyK4hNzRr3BtODnZnXzK/loNNT32yL4/pRrl4iOna56i/L7Nprre8xmUaJoXT5nvz/HA==",
+      "installerVersion": "6.1.1"
+    },
+    {
+      "identifier": "tallal-test",
+      "source": "@tallal-test/v1.1#50hqd1wltgtkras",
+      "integrity": "sha512-0dnSk3RgTkmPHQ0VSPjZWt3AJ4vLqVu3ZOQJlUufTk9m3M0I9Nu0zfePMsRztqL7hhkbYgRU0p9cj4M+I0cdEA==",
+      "installerVersion": "6.1.1"
+    }
+  ]
+}

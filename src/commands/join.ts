@@ -78,9 +78,7 @@ export const data = new SlashCommandBuilder()
           discordID: interaction.user.id,
           maticAddress: interaction.options.getString('matic_wallet').replace(/[A-Z]/g, match => match.toLowerCase()),
           tokenIds: tokenIds,
-          headTraits: [],
-          backgroundTraits: [],
-          jellyBalance: 0,
+          coinsBalance: 0,
         });
   
         await dm.author.send('Verification successful! Your Discord account is linked with your Ethereum wallet.');
