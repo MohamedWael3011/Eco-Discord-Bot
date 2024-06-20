@@ -156,7 +156,7 @@ const messageCooldowns = new Map();
                     "bank_balance_input"
                   );
                 if (!isNumber(balanceToAdd)) {
-                  return modalInteraction.followUp({
+                  return await modalInteraction.followUp({
                     content: "Please enter a valid number",
                     ephemeral: true,
                   });
@@ -183,12 +183,12 @@ const messageCooldowns = new Map();
                     Number(balanceToAdd)
                   ))
                 )
-                  modalInteraction.followUp({
+                  await modalInteraction.followUp({
                     content: `Balance was added Successfully!`,
                     ephemeral: true,
                   });
                 else
-                  modalInteraction.followUp({
+                  await modalInteraction.followUp({
                     content: `Something went wrong, please try again.`,
                     ephemeral: true,
                   });
@@ -226,7 +226,7 @@ const messageCooldowns = new Map();
                     "bank_balance_input"
                   );
                 if (!isNumber(balanceToRemove)) {
-                  return modalInteraction.followUp({
+                  return await modalInteraction.followUp({
                     content: "Please enter a valid number",
                     ephemeral: true,
                   });
@@ -235,7 +235,7 @@ const messageCooldowns = new Map();
                   modalInteraction.user.id
                 );
                 if (Number(balanceToRemove) > Number(userBankBalance))
-                  return modalInteraction.followUp({
+                  return await modalInteraction.followUp({
                     content:
                       "You cannot withrdaw more than the amount that you have.",
                     ephemeral: true,
@@ -253,12 +253,12 @@ const messageCooldowns = new Map();
                     Number(balanceToRemove)
                   ))
                 )
-                  modalInteraction.followUp({
+                  await modalInteraction.followUp({
                     content: `Balance was removed Successfully!`,
                     ephemeral: true,
                   });
                 else
-                  modalInteraction.followUp({
+                  await modalInteraction.followUp({
                     content: `Something went wrong, please try again.`,
                     ephemeral: true,
                   });
