@@ -24,13 +24,17 @@ import {
   addBankBalance,
   getBalance,
   getBankBalance,
+  getMaticAddress,
   removeBalance,
   removeBankBalance,
+  stakeNFT,
   userModel,
 } from "./models/User";
 import { bankEmbedBuilder } from "./utils/bankEmbedBalance";
 import { isNumber } from "./utils/isNumber";
 import { Config, initializeConfig, Reward } from "./models/Rewards";
+import { getUserOwnedTokenIds } from "./web3/thirdweb";
+import { raffleEvents } from "./events/RaffleEvents";
 
 config();
 const COOLDOWN_TIME = 60000;
@@ -41,6 +45,7 @@ const messageCooldowns = new Map();
   validateEnv(client);
   client.cache = {};
   handleEvents(client);
+  raffleEvents(client);
   client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
 
@@ -126,11 +131,12 @@ const messageCooldowns = new Map();
           });
         }
         if (interaction.customId === "view_bankbalance") {
+          await interaction.deferReply();
           const bankEmbed = await bankEmbedBuilder(
             interaction.client as ExtendedClient,
             interaction.user.id
           );
-          await interaction.reply({ embeds: [bankEmbed], ephemeral: true });
+          await interaction.followUp({ embeds: [bankEmbed], ephemeral: true });
         } else if (interaction.customId === "add_balance") {
           try {
             const modal = new ModalBuilder({
@@ -270,6 +276,39 @@ const messageCooldowns = new Map();
           } catch (err) {
             errorHandler(client, err, "Removing Balance");
           }
+        } else if (interaction.customId === "stake_all") {
+          try {
+            await interaction.deferReply();
+            const isUser = await userModel.exists({
+              discordID: interaction.user.id,
+            });
+            if (!isUser) {
+              await interaction.reply({
+                content: "Please join the system first by doing `/join`",
+                ephemeral: true,
+              });
+              return;
+            }
+
+            const walletAddress = await getMaticAddress(interaction.user.id);
+            const ownedIds = await getUserOwnedTokenIds(walletAddress);
+            for (const tokenId of ownedIds) {
+              await stakeNFT(interaction.user.id, tokenId);
+            }
+
+            await interaction.followUp({
+              content: "All NFTs have been staked.",
+              ephemeral: true,
+            });
+          } catch (err) {
+            errorHandler(client, err, "Staking Error");
+          }
+        } else if (interaction.customId === "connect_wallet") {
+          await interaction.reply({
+            content:
+              "please verify your account by visiting : https://drippy-dudes-auth.vercel.app/",
+            ephemeral: true,
+          });
         }
       }
     } catch (err) {

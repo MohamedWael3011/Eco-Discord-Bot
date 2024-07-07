@@ -15,5 +15,6 @@ export * as update_message_rate from "./update_message_rate";
 export * as update_react_rate from "./update_react_rate";
 export * as update_admin_channel from "./update_admin_channel";
 export * as update_announce_channel from "./update_announce_channel";
+export * as create_raffle from "./create_raffle";
 
 

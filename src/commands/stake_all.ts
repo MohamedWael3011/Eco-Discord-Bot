@@ -32,6 +32,6 @@ export async function execute(
       ephemeral: true,
     });
   } catch (err) {
-    errorHandler(bot, err, "Stacking Error");
+    errorHandler(bot, err, "Staking Error");
   }
 }

@@ -59,10 +59,21 @@ export async function execute(
       .setLabel("➖ Withdraw Balance")
       .setStyle(ButtonStyle.Danger);
 
+      const stakeButton = new ButtonBuilder()
+      .setCustomId("stake_all")
+      .setLabel("Stake All NFTs")
+      .setStyle(ButtonStyle.Secondary);
+      const connectButton = new ButtonBuilder()
+      .setCustomId("connect_wallet")
+      .setLabel("Connect Wallet")
+      .setStyle(ButtonStyle.Secondary);
+
     const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       viewBalanceButton,
       addBalanceButton,
-      removeBalanceButton
+      removeBalanceButton,
+      stakeButton,
+      connectButton
     );
 
     // Send the embed with buttons
