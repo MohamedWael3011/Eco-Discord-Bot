@@ -136,7 +136,7 @@ const messageCooldowns = new Map();
           });
         }
         if (interaction.customId === "view_bankbalance") {
-          await interaction.deferReply();
+          await interaction.deferReply({ephemeral:true});
           const bankEmbed = await bankEmbedBuilder(
             interaction.client as ExtendedClient,
             interaction.user.id
@@ -165,7 +165,7 @@ const messageCooldowns = new Map();
             interaction
               .awaitModalSubmit({ filter, time: 60_000 })
               .then(async (modalInteraction) => {
-                await modalInteraction.deferReply();
+                await modalInteraction.deferReply({ephemeral:true});
                 const balanceToAdd =
                   modalInteraction.fields.getTextInputValue(
                     "bank_balance_input"
@@ -235,7 +235,7 @@ const messageCooldowns = new Map();
             interaction
               .awaitModalSubmit({ filter, time: 60_000 })
               .then(async (modalInteraction) => {
-                await modalInteraction.deferReply();
+                await modalInteraction.deferReply({ephemeral:true});
                 const balanceToRemove =
                   modalInteraction.fields.getTextInputValue(
                     "bank_balance_input"
@@ -283,12 +283,12 @@ const messageCooldowns = new Map();
           }
         } else if (interaction.customId === "stake_all") {
           try {
-            await interaction.deferReply();
+            await interaction.deferReply({ephemeral:true});
             const isUser = await userModel.exists({
               discordID: interaction.user.id,
             });
             if (!isUser) {
-              await interaction.reply({
+              await interaction.followUp({
                 content: "Please join the system first by doing `/join`",
                 ephemeral: true,
               });
