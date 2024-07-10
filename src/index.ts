@@ -48,7 +48,11 @@ const messageCooldowns = new Map();
   raffleEvents(client);
   client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
-    if (message.channel.id !== "1137090619269980251") return;
+    if (
+      message.channel.id !== "1137090619269980251" &&
+      message.channel.id !== "973209648872181800"
+    )
+      return;
 
     const userId = message.author.id;
     const now = Date.now();
