@@ -136,7 +136,7 @@ const messageCooldowns = new Map();
           });
         }
         if (interaction.customId === "view_bankbalance") {
-          await interaction.deferReply({ephemeral:true});
+          await interaction.deferReply({ ephemeral: true });
           const bankEmbed = await bankEmbedBuilder(
             interaction.client as ExtendedClient,
             interaction.user.id
@@ -165,7 +165,7 @@ const messageCooldowns = new Map();
             interaction
               .awaitModalSubmit({ filter, time: 60_000 })
               .then(async (modalInteraction) => {
-                await modalInteraction.deferReply({ephemeral:true});
+                await modalInteraction.deferReply({ ephemeral: true });
                 const balanceToAdd =
                   modalInteraction.fields.getTextInputValue(
                     "bank_balance_input"
@@ -235,7 +235,7 @@ const messageCooldowns = new Map();
             interaction
               .awaitModalSubmit({ filter, time: 60_000 })
               .then(async (modalInteraction) => {
-                await modalInteraction.deferReply({ephemeral:true});
+                await modalInteraction.deferReply({ ephemeral: true });
                 const balanceToRemove =
                   modalInteraction.fields.getTextInputValue(
                     "bank_balance_input"
@@ -283,7 +283,7 @@ const messageCooldowns = new Map();
           }
         } else if (interaction.customId === "stake_all") {
           try {
-            await interaction.deferReply({ephemeral:true});
+            await interaction.deferReply({ ephemeral: true });
             const isUser = await userModel.exists({
               discordID: interaction.user.id,
             });
@@ -309,11 +309,16 @@ const messageCooldowns = new Map();
             errorHandler(client, err, "Staking Error");
           }
         } else if (interaction.customId === "connect_wallet") {
-          await interaction.reply({
-            content:
-              "please verify your account by visiting : https://drippy-dudes-auth.vercel.app/",
-            ephemeral: true,
-          });
+          try {
+            await interaction.deferReply({ ephemeral: true }); // Acknowledge the interaction
+            await interaction.followUp({
+              content:
+                "please verify your account by visiting: https://drippy-dudes-auth.vercel.app/",
+              ephemeral: true,
+            });
+          } catch (err) {
+            errorHandler(client, err, "Connect Wallet Error");
+          }
         }
       }
     } catch (err) {

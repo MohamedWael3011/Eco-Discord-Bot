@@ -1,4 +1,4 @@
-import { Interaction } from "discord.js";
+import { Interaction, InteractionType } from "discord.js";
 import { ExtendedClient } from "../interfaces/ExtendedClient";
 import { buyTicket, getActiveRaffle, Raffle } from "../models/Raffle";
 import { getBalance, removeBalance } from "../models/User";
@@ -7,11 +7,19 @@ import { createRaffleEmbed } from "../utils/createRaffle";
 
 export const raffleEvents = (client: ExtendedClient) => {
   client.on("interactionCreate", async (interaction: Interaction) => {
-    if (!interaction.isButton()) return;
-
+    if (interaction.type !== InteractionType.MessageComponent) return;
+    if (
+      interaction.customId !== "show_participants" &&
+      interaction.customId !== "buy_ticket"
+    )
+      return;
+    await interaction.deferReply({ ephemeral: true });
     const raffle = await Raffle.findOne({ isActive: true });
     if (!raffle) {
-      await interaction.reply("No active raffle.");
+      await interaction.followUp({
+        content: "No active raffle.",
+        ephemeral: true,
+      });
       return;
     }
 
@@ -20,7 +28,7 @@ export const raffleEvents = (client: ExtendedClient) => {
         raffle.participants
           .map((p) => `<@${p.userId}>: ${p.ticketCount} ticket(s)`)
           .join("\n") || "No participants yet.";
-      await interaction.reply({
+      await interaction.followUp({
         content: `**Participants:**\n${participantList}`,
         ephemeral: true,
       });
@@ -29,7 +37,6 @@ export const raffleEvents = (client: ExtendedClient) => {
 
     if (interaction.customId === "buy_ticket") {
       try {
-        await interaction.deferReply({ ephemeral: true });
         const user = interaction.user.id;
         const balance = await getBalance(user);
         const raffle = await getActiveRaffle();
