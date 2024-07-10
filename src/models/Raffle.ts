@@ -12,6 +12,9 @@ export interface IRaffle extends Document {
   ticketPrice: number;
   maxTickets: number;
   isActive: boolean;
+  endDate: Date;
+  messageId: string;
+  channelId: string;
 }
 
 const ParticipantSchema: Schema = new Schema({
@@ -24,18 +27,26 @@ const RaffleSchema: Schema = new Schema({
   description: { type: String, required: true },
   participants: { type: [ParticipantSchema], default: [] },
   ticketPrice: { type: Number, required: true },
-  maxTickets: { type: Number, required: true }, // Add this line
+  maxTickets: { type: Number, required: true },
   isActive: { type: Boolean, default: true },
+  endDate: { type: Date, required: true },
+  messageId: { type: String }, // Add this line
+  channelId: { type: String }, // Add this line
 });
 
 export const Raffle = mongoose.model<IRaffle>("Raffle", RaffleSchema);
 
 // Example to create a raffle (you might trigger this with a command)
+import { EmbedBuilder, TextChannel } from "discord.js";
+import { ExtendedClient } from "../interfaces/ExtendedClient";
+
 export const createRaffle = async (
-  title,
-  description,
-  ticketPrice,
-  maxTickets
+  title: string,
+  description: string,
+  ticketPrice: number,
+  maxTickets: number,
+  endDate: Date,
+  channel: TextChannel
 ) => {
   const newRaffle = new Raffle({
     title,
@@ -44,16 +55,19 @@ export const createRaffle = async (
     maxTickets,
     participants: [],
     isActive: true,
+    endDate,
+    channelId: channel.id, // Save channel ID
   });
 
   await newRaffle.save();
+  return newRaffle;
 };
 
 export const getActiveRaffle = async () => {
   return await Raffle.findOne({ isActive: true });
 };
 
-export const pickWinner = async () => {
+export const pickWinner = async (bot: ExtendedClient) => {
   const raffle = await getActiveRaffle();
   if (!raffle || !raffle.isActive) {
     throw new Error("Raffle not found or not active");
@@ -71,13 +85,32 @@ export const pickWinner = async () => {
   const winnerIndex = Math.floor(Math.random() * totalTickets);
   const winner = ticketArray[winnerIndex];
 
+  const channel = (await bot.channels.fetch(raffle.channelId)) as TextChannel;
+  const message = await channel.messages.fetch(raffle.messageId);
   raffle.isActive = false;
   await raffle.save();
+  await channel.send({
+    content: `<@${winner}> has won the ${raffle.title} Raffle. Congrats!`,
+  });
+  const embed = new EmbedBuilder()
+    .setTitle(raffle.title)
+    .setDescription(raffle.description)
+    .addFields(
+      { name: "Ticket Price", value: `${raffle.ticketPrice} coins` },
+      { name: "Winner:", value: `<@${winner}>` }
+    );
+  await message.edit({
+    embeds: [embed],
+  });
 
   return winner;
 };
 
-export const buyTicket = async (userId: string, ticketCount: number) => {
+export const buyTicket = async (
+  userId: string,
+  ticketCount: number,
+  bot: ExtendedClient
+) => {
   const raffle = await getActiveRaffle();
   if (!raffle || !raffle.isActive) {
     throw new Error("Raffle not found or not active");
@@ -100,7 +133,7 @@ export const buyTicket = async (userId: string, ticketCount: number) => {
   }
 
   if (currentTickets + ticketCount === raffle.maxTickets) {
-    return await pickWinner(); // Automatically pick a winner
+    return await pickWinner(bot); // Automatically pick a winner
   } else {
     await raffle.save();
   }

@@ -9,10 +9,10 @@ import {
 } from "discord.js";
 import { ExtendedClient } from "../interfaces/ExtendedClient";
 import { isAdmin } from "../utils/isAdmin";
+import { addDays } from "date-fns";
 import { errorHandler } from "../logger/errorHandler";
 import { createRaffle, getActiveRaffle, IRaffle } from "../models/Raffle";
 import { createRaffleEmbed } from "../utils/createRaffle";
-
 export const data = new SlashCommandBuilder()
   .setName("create_raffle")
   .setDescription("Create Raffle")
@@ -21,7 +21,7 @@ export const data = new SlashCommandBuilder()
       .setName("channel")
       .setDescription("Desired channel")
       .setRequired(true)
-      .addChannelTypes(ChannelType.GuildText) // Ensure only text channels can be selected
+      .addChannelTypes(ChannelType.GuildText)
   )
   .addStringOption(
     new SlashCommandStringOption().setName("title").setDescription("Title")
@@ -40,6 +40,11 @@ export const data = new SlashCommandBuilder()
     new SlashCommandNumberOption()
       .setName("max_ticket")
       .setDescription("Ticket Max")
+  )
+  .addNumberOption(
+    new SlashCommandNumberOption()
+      .setName("duration_days")
+      .setDescription("Duration in days")
   );
 
 export async function execute(
@@ -52,33 +57,48 @@ export async function execute(
     const activeRaffle: IRaffle = await getActiveRaffle();
     if (activeRaffle) {
       return await interaction.followUp({
-        content: "There is an active raffle alreadt",
+        content: "There is an active raffle already",
         ephemeral: true,
       });
     }
+
     const title = interaction.options.getString("title");
     const description = interaction.options.getString("description");
     const ticketPrice = Number(interaction.options.getNumber("ticket_price"));
     const ticketMax = Number(interaction.options.getNumber("max_ticket"));
+    const durationDays = Number(interaction.options.getNumber("duration_days"));
     const channel = interaction.options.getChannel(
       "channel",
       true
     ) as TextChannel;
-    if (isNaN(ticketPrice) || isNaN(ticketMax)) {
+
+    if (isNaN(ticketPrice) || isNaN(ticketMax) || isNaN(durationDays)) {
       return await interaction.followUp({
         content: "Please enter a valid number",
         ephemeral: true,
       });
     }
 
-    await createRaffle(title, description, ticketPrice, ticketMax);
-    const raffle: IRaffle = await getActiveRaffle();
+    const endDate = addDays(new Date(), durationDays);
+
+    const raffle = await createRaffle(
+      title,
+      description,
+      ticketPrice,
+      ticketMax,
+      endDate,
+      channel
+    );
 
     const { embed, buttons } = await createRaffleEmbed(raffle);
     const message = await channel.send({
       embeds: [embed],
       components: [buttons],
     });
+
+    raffle.messageId = message.id; // Save message ID
+    await raffle.save();
+
     await interaction.followUp("Raffle has been created!");
   } catch (err) {
     errorHandler(bot, err, "Raffle Create Error");

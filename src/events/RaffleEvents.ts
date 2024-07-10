@@ -1,4 +1,4 @@
-import { EmbedBuilder, Interaction } from "discord.js";
+import { Interaction } from "discord.js";
 import { ExtendedClient } from "../interfaces/ExtendedClient";
 import { buyTicket, getActiveRaffle, Raffle } from "../models/Raffle";
 import { getBalance, removeBalance } from "../models/User";
@@ -42,33 +42,17 @@ export const raffleEvents = (client: ExtendedClient) => {
         }
         const isReduced = await removeBalance(user, raffle.ticketPrice);
         if (isReduced) {
-          const isWinner = await buyTicket(user, 1);
+          await buyTicket(user, 1, client);
           await interaction.followUp({
             content: "Ticket purchased successfully!",
             ephemeral: true,
           });
-          if (isWinner) {
-            await interaction.followUp({
-              content: `<@${user}> has won the ${raffle.title} Raffle. Congrats!`,
-            });
-            const embed = new EmbedBuilder()
-              .setTitle(raffle.title)
-              .setDescription(raffle.description)
-              .addFields(
-                { name: "Ticket Price", value: `${raffle.ticketPrice} coins` },
-                { name: "Winner:", value: `<@${isWinner}>` }
-              );
-            await interaction.message.edit({
-              embeds: [embed],
-            });
-          } else {
-            const updatedRaffle = await getActiveRaffle(); // Fetch the updated raffle
-            const { embed, buttons } = createRaffleEmbed(updatedRaffle);
-            await interaction.message.edit({
-              embeds: [embed],
-              components: [buttons],
-            });
-          }
+          const updatedRaffle = await getActiveRaffle(); // Fetch the updated raffle
+          const { embed, buttons } = createRaffleEmbed(updatedRaffle);
+          await interaction.message.edit({
+            embeds: [embed],
+            components: [buttons],
+          });
         }
       } catch (err) {
         errorHandler(client, err, "Buying Ticket");

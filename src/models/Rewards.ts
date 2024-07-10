@@ -12,6 +12,7 @@ export const configSchema = new Schema({
   rewardRateReaction: Number,
   adminChannel: String,
   announcementChannel: String,
+  raffleChannel: String,
 });
 
 export const Reward = model("Reward", rewardSchema);
@@ -26,6 +27,7 @@ export async function initializeConfig() {
       rewardRateReaction: 5, // Example reward rate for reactions
       adminChannel: "",
       announcementChannel: "",
+      raffleChannel: "",
     });
     await newConfig.save();
   }

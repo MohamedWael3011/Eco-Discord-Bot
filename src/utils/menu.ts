@@ -49,82 +49,81 @@ export default async function shopMenuBuilder(bot, interaction) {
   if (!listenersAdded) {
     listenersAdded = true;
 
-    // Event listener for select menu interaction
+    // Event listener for interactions
     bot.on("interactionCreate", async (interaction) => {
-      try{
-        if (!interaction.isStringSelectMenu()) return;
-
-        if (interaction.customId === "shopmenu") {
+      try {
+        if (
+          interaction.isStringSelectMenu() &&
+          interaction.customId === "shopmenu"
+        ) {
           const selectedValue = interaction.values[0];
           const selectedItem = items.find(
             (item) => item._id.toString() === selectedValue
           );
-  
+
           const confirmButton = new ButtonBuilder()
             .setCustomId(`confirmPurchase_${selectedItem._id}`)
             .setLabel("Confirm")
             .setStyle(ButtonStyle.Primary);
-  
+
           const cancelButton = new ButtonBuilder()
             .setCustomId("cancelPurchase")
             .setLabel("Cancel")
             .setStyle(ButtonStyle.Secondary);
-  
+
           const buttonRow = new ActionRowBuilder().addComponents(
             confirmButton,
             cancelButton
           );
-  
+
           await interaction.update({
             content: `Do you want to buy **${selectedItem.itemName}** for **${selectedItem.price}**?`,
             components: [buttonRow],
             ephemeral: true,
           });
+        } else if (interaction.isButton()) {
+          if (interaction.customId.startsWith("confirmPurchase_")) {
+            const itemId = interaction.customId.split("_")[1];
+            const selectedItem = items.find(
+              (item) => item._id.toString() === itemId
+            );
+
+            if (selectedItem) {
+              // Acknowledge the interaction before proceeding
+              await interaction.deferUpdate();
+              // Perform the purchase logic
+              const purchaseResult = await buyItem(
+                interaction,
+                bot,
+                selectedItem.itemName
+              );
+
+              // Update the original message, removing buttons
+              await interaction.editReply({
+                content: purchaseResult
+                  ? `${selectedItem.itemName} has been purchased successfully.`
+                  : "Purchase failed. Please try again.",
+                components: [],
+              });
+            } else {
+              await interaction.deferUpdate();
+              await interaction.editReply({
+                content: "Item not found. Purchase failed.",
+                components: [],
+              });
+            }
+          } else if (interaction.customId === "cancelPurchase") {
+            // Acknowledge the interaction before proceeding
+            await interaction.deferUpdate();
+            // Update the original message, removing buttons
+            await interaction.editReply({
+              content: "Purchase cancelled.",
+              components: [],
+            });
+          }
         }
-      }
-      catch(err){
-        errorHandler(bot,err,"Interaction Error")
-      }
-      
-    });
-
-    // Event listener for button interaction
-    bot.on("interactionCreate", async (interaction) => {
-      if (!interaction.isButton()) return;
-
-      if (interaction.customId.startsWith("confirmPurchase_")) {
-        const itemId = interaction.customId.split("_")[1];
-        const selectedItem = items.find(
-          (item) => item._id.toString() === itemId
-        );
-
-        if (selectedItem) {
-          // Acknowledge the interaction before proceeding
-          await interaction.deferUpdate();
-          // Perform the purchase logic
-          const purchaseResult = await buyItem(
-            interaction,
-            bot,
-            selectedItem.itemName
-          );
-
-          // Update the original message, removing buttons
-          await interaction.deleteReply();
-        } else {
-          await interaction.deferUpdate();
-          await interaction.editReply({
-            content: "Item not found. Purchase failed.",
-            components: [],
-          });
-        }
-      } else if (interaction.customId === "cancelPurchase") {
-        // Acknowledge the interaction before proceeding
-        await interaction.deferUpdate();
-        // Update the original message, removing buttons
-        await interaction.editReply({
-          content: "Purchase cancelled.",
-          components: [],
-        });
+      } catch (err) {
+        errorHandler(bot, err, "Interaction Error");
       }
     });
   }

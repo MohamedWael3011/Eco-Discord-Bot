@@ -14,8 +14,8 @@ import { ExtendedClient } from "../interfaces/ExtendedClient";
 import { isAdmin } from "../utils/isAdmin";
 
 export const data = new SlashCommandBuilder()
-  .setName("send_bank_embed")
-  .setDescription("Send Bank Embed")
+  .setName("send_stake_embed")
+  .setDescription("Send Stake Embed")
   .addChannelOption(
     new SlashCommandChannelOption()
       .setName("channel")
@@ -37,31 +37,22 @@ export async function execute(
 
     // Create the initial embed
     const bankEmbed = new EmbedBuilder()
-      .setTitle("🏦 Bank 🏦")
-      .setDescription(
-        "Manage your bank balance here.\n\n 💵 Click on the **View Balance** button below to see your current bank balance.\n\n ➕ Click on the **Add Balance** button to deposit funds.\n\n ➖ Click on the **Remove Balance** button to withdraw funds."
-      );
+      .setTitle("🏦 Staking 🏦")
+      .setDescription("Learn more about our staking system!");
 
     // Create the buttons
-    const viewBalanceButton = new ButtonBuilder()
-      .setCustomId("view_bankbalance")
-      .setLabel("💵 View Balance")
-      .setStyle(ButtonStyle.Success);
-
-    const addBalanceButton = new ButtonBuilder()
-      .setCustomId("add_balance")
-      .setLabel("➕ Add Balance")
-      .setStyle(ButtonStyle.Primary);
-
-    const removeBalanceButton = new ButtonBuilder()
-      .setCustomId("remove_balance")
-      .setLabel("➖ Withdraw Balance")
-      .setStyle(ButtonStyle.Danger);
+    const stakeButton = new ButtonBuilder()
+      .setCustomId("stake_all")
+      .setLabel("Stake All NFTs")
+      .setStyle(ButtonStyle.Secondary);
+    const connectButton = new ButtonBuilder()
+      .setCustomId("connect_wallet")
+      .setLabel("Connect Wallet")
+      .setStyle(ButtonStyle.Secondary);
 
     const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      viewBalanceButton,
-      addBalanceButton,
-      removeBalanceButton
+      stakeButton,
+      connectButton
     );
 
     // Send the embed with buttons
@@ -71,7 +62,7 @@ export async function execute(
     });
 
     await interaction.reply({
-      content: `Bank embed sent to ${channel}.`,
+      content: `Stake embed sent to ${channel}.`,
       ephemeral: true,
     });
   } catch (error) {
