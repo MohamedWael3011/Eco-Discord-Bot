@@ -24,27 +24,34 @@ export const data = new SlashCommandBuilder()
       .addChannelTypes(ChannelType.GuildText)
   )
   .addStringOption(
-    new SlashCommandStringOption().setName("title").setDescription("Title")
+    new SlashCommandStringOption()
+      .setName("title")
+      .setDescription("Title")
+      .setRequired(true)
   )
   .addStringOption(
     new SlashCommandStringOption()
       .setName("description")
       .setDescription("Description")
+      .setRequired(true)
   )
   .addNumberOption(
     new SlashCommandNumberOption()
       .setName("ticket_price")
       .setDescription("Ticket Price")
+      .setRequired(true)
   )
   .addNumberOption(
     new SlashCommandNumberOption()
       .setName("max_ticket")
       .setDescription("Ticket Max")
+      .setRequired(true)
   )
   .addNumberOption(
     new SlashCommandNumberOption()
       .setName("duration_days")
       .setDescription("Duration in days")
+      .setRequired(true)
   );
 
 export async function execute(
